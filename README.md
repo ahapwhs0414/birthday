@@ -14,8 +14,9 @@ npm run dev
 
 1. `supabase/migrations/20260917000000_initial.sql`을 적용합니다.
 2. Supabase Auth에 예진이 소유자 계정을 만든 후 주석의 예시대로 `recipients` 행을 추가합니다.
-3. `.env.local`에 Supabase URL, anon key, 서버 전용 service role key, `OWNER_EMAIL`을 설정합니다.
-4. `/admin`은 로그인한 사용자 이메일과 `OWNER_EMAIL`이 일치할 때만 최신순 기록을 표시합니다.
+3. `.env.local`에 Supabase URL, anon key, 서버 전용 service role key, `OWNER_EMAIL`, `OWNER_USERNAME`을 설정합니다.
+4. Supabase Auth의 소유자 계정에 비밀번호를 설정합니다. `/login`에서는 `OWNER_USERNAME`과 비밀번호로 로그인합니다.
+5. `/admin`은 로그인한 사용자 이메일과 `OWNER_EMAIL`이 일치할 때만 최신순 기록을 표시합니다.
 
 서비스 역할 키는 절대 `NEXT_PUBLIC_` 접두사로 만들거나 브라우저 코드에 넣지 마세요.
 
