@@ -5,7 +5,7 @@ import { birthdayContent, type PracticeAnswer } from "@/lib/content";
 import { isExamCorrect, scorePractice, validateMessage, validateParticipant } from "@/lib/game";
 
 type Step = "story" | "info" | "exam-intro" | "exam" | "exam-result" | "practice-intro" | "practice" | "practice-result" | "message" | "submitting" | "completed";
-type Draft = { step: Step; storyIndex: number; displayName: string; relationship: string; relationshipChoice: string; examChoice: number | null; examScore: 0 | 100; answers: PracticeAnswer[]; message: string; submissionKey: string; recordId?: string };
+type Draft = { step: Step; storyIndex: number; displayName: string; relationship: string; relationshipChoice: string; examChoice: number | null; examScore: 0 | 100; answers: PracticeAnswer[]; message: string; submissionKey: string; recordId?: string; testMode?: boolean };
 
 const initialDraft = (): Draft => ({ step: "story", storyIndex: 0, displayName: "", relationship: "", relationshipChoice: "", examChoice: null, examScore: 0, answers: [], message: "", submissionKey: crypto.randomUUID() });
 const stepOrder: Step[] = ["story", "info", "exam-intro", "exam", "exam-result", "practice-intro", "practice", "practice-result", "message", "submitting", "completed"];
@@ -63,7 +63,7 @@ export default function BirthdayJourney() {
       const response = await fetch("/api/participations", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ recipientId: birthdayContent.recipient.id, displayName: draft.displayName, relationship: draft.relationship === "비공개" ? "" : draft.relationship, examChoice: draft.examChoice, examScore: draft.examScore, practiceAnswers: draft.answers, practiceScore, message: draft.message, clientSubmissionKey: draft.submissionKey }) });
       const result = await response.json();
       if (!response.ok) throw new Error(result.message ?? "저장하지 못했어요.");
-      update({ step: "completed", recordId: result.id });
+      update({ step: "completed", recordId: result.id ?? undefined, testMode: result.testMode === true });
     } catch (reason) { update({ step: "message" }); setError(reason instanceof Error ? reason.message : "잠시 후 다시 시도해 주세요."); }
   };
   const share = async () => {
@@ -84,7 +84,7 @@ export default function BirthdayJourney() {
       {draft.step === "practice" && practiceRound && <><Eyebrow>준비물 {draft.answers.length + 1} / 3</Eyebrow><div className="avatar"><span>👩🏻</span>{draft.answers.map((answer) => <small key={answer.roundId}>{birthdayContent.practice.find(r => r.id === answer.roundId)?.options.find(o => o.id === answer.choiceId)?.emoji}</small>)}</div><h1>{practiceRound.prompt}</h1><div className="practice-grid">{practiceRound.options.map((option) => <button key={option.id} onClick={() => choosePractice(option.id)}><b>{option.emoji}</b><span>{option.label}</span></button>)}</div></>}
       {draft.step === "practice-result" && <><div className="hero-emoji">🎒</div><Eyebrow>준비 완료</Eyebrow><h1>3개 중 {practiceScore}개를 맞혔어요!</h1><div className="answer-list">{draft.answers.map((answer) => { const round = birthdayContent.practice.find(r => r.id === answer.roundId)!; const option = round.options.find(o => o.id === answer.choiceId)!; return <div key={answer.roundId}><span>{option.emoji} {option.label}</span><b>{answer.choiceId === round.correctId ? "✓" : "아차!"}</b></div>; })}</div><button className="primary" onClick={() => update({ step: "message" })}>마지막 부탁 보기</button></>}
       {(draft.step === "message" || draft.step === "submitting") && <><div className="hero-emoji">💌</div><Eyebrow>마지막 한마디</Eyebrow><h1>{draft.displayName.trim()}의 축하가<br />예진이를 더 행복하게 해요!</h1><label>축하 메시지<textarea maxLength={300} rows={5} value={draft.message} onChange={(e) => update({ message: e.target.value })} placeholder="예진아, 22번째 생일 정말 축하해! 오늘은 꼭 행복하게 쉬어야 해 🎂" /></label><div className="counter">{draft.message.length} / 300</div><ErrorText text={error} /><button className="primary" disabled={draft.step === "submitting"} onClick={submit}>{draft.step === "submitting" ? "소중히 저장하는 중…" : "축하 메시지 보내기"}</button></>}
-      {draft.step === "completed" && <><Eyebrow>축하 배달 완료</Eyebrow><h1>예진이의 생일을 축하해주셔서 감사합니다!</h1><div className="completion-photo" aria-hidden="true">🎉</div><div className="result-summary"><div><small>시험</small><strong>{draft.examScore}점</strong></div><div><small>실습</small><strong>{practiceScore}/3</strong></div></div><blockquote>{draft.message}</blockquote><button className="primary" onClick={share}>친구에게 참여 링크 보내기</button>{shareNotice && <p className="notice">{shareNotice}</p>}</>}
+      {draft.step === "completed" && <><Eyebrow>축하 배달 완료</Eyebrow><h1>예진이의 생일을 축하해주셔서 감사합니다!</h1><div className="completion-photo" aria-hidden="true">🎉</div>{draft.testMode && <p className="notice">테스트 참여는 저장되지 않아 예진이의 보관함에 표시되지 않아요.</p>}<div className="result-summary"><div><small>시험</small><strong>{draft.examScore}점</strong></div><div><small>실습</small><strong>{practiceScore}/3</strong></div></div><blockquote>{draft.message}</blockquote><button className="primary" onClick={share}>친구에게 참여 링크 보내기</button>{shareNotice && <p className="notice">{shareNotice}</p>}</>}
     </section>
     <footer>예진이의 생일을 축하해!~</footer>
   </main>;
