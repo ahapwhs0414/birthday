@@ -86,7 +86,7 @@ export default function BirthdayJourney() {
       {(draft.step === "message" || draft.step === "submitting") && <><div className="hero-emoji">💌</div><Eyebrow>마지막 한마디</Eyebrow><h1>{draft.displayName.trim()}의 축하가<br />예진이를 더 행복하게 해요!</h1><label>축하 메시지<textarea maxLength={300} rows={5} value={draft.message} onChange={(e) => update({ message: e.target.value })} placeholder="예진아, 22번째 생일 정말 축하해! 오늘은 꼭 행복하게 쉬어야 해 🎂" /></label><div className="counter">{draft.message.length} / 300</div><ErrorText text={error} /><button className="primary" disabled={draft.step === "submitting"} onClick={submit}>{draft.step === "submitting" ? "소중히 저장하는 중…" : "축하 메시지 보내기"}</button></>}
       {draft.step === "completed" && <><div className="confetti" aria-hidden>✦ 🎉 ✦</div><Eyebrow>축하 배달 완료</Eyebrow><h1>{draft.displayName.trim()} 덕분에<br />예진이의 22번째 생일이<br />더욱 행복해졌어요!</h1><div className="result-summary"><div><small>시험</small><strong>{draft.examScore}점</strong></div><div><small>실습</small><strong>{practiceScore}/3</strong></div></div><blockquote>{draft.message}</blockquote><button className="primary" onClick={share}>친구에게 참여 링크 보내기</button><button className="secondary" onClick={() => update({ step: "completed" })}>내 기록 다시 보기</button>{shareNotice && <p className="notice">{shareNotice}</p>}</>}
     </section>
-    <footer>예진이의 스물두 번째 생일 · 2026</footer>
+    <footer>예진이의 생일을 축하해!~</footer>
   </main>;
 }
 
@@ -94,7 +94,7 @@ function Story({ index, previous, next }: { index: number; previous: () => void;
   const item = birthdayContent.story[index];
   const touchStart = useRef(0);
   const endSwipe = (event: TouchEvent) => { const distance = event.changedTouches[0].clientX - touchStart.current; if (distance < -45) next(); if (distance > 45 && index > 0) previous(); };
-  return <div className="story" onTouchStart={(event) => { touchStart.current = event.touches[0].clientX; }} onTouchEnd={endSwipe}><Eyebrow>생일 이야기</Eyebrow><div className="story-art"><span>{item.emoji}</span><i className={index === 3 ? "help-label" : undefined}>{index === 0 ? "22" : index === 3 ? "HELP!" : ""}</i></div><h1>{item.title}</h1>{item.detail && <p>{item.detail}</p>}<div className="dots">{birthdayContent.story.map((_, i) => <i key={i} className={i === index ? "active" : ""} />)}</div><div className="actions">{index > 0 && <button className="secondary" onClick={previous}>이전</button>}<button className="primary" onClick={next}>{index === 3 ? "예진이 도와주기" : "다음 이야기"}</button></div></div>;
+  return <div className="story" onTouchStart={(event) => { touchStart.current = event.touches[0].clientX; }} onTouchEnd={endSwipe}><Eyebrow>생일 이야기</Eyebrow><div className="story-art"><span>{item.emoji}</span>{index === 0 && <i>22</i>}</div><h1>{item.title}</h1>{item.detail && <p>{item.detail}</p>}<div className="dots">{birthdayContent.story.map((_, i) => <i key={i} className={i === index ? "active" : ""} />)}</div><div className="actions">{index > 0 && <button className="secondary" onClick={previous}>이전</button>}<button className="primary" onClick={next}>{index === 3 ? "예진이 도와주기" : "다음 이야기"}</button></div></div>;
 }
 function Intro({ emoji, eyebrow, title, text, button, onClick }: { emoji: string; eyebrow: string; title: string; text: string; button: string; onClick: () => void }) { return <><Eyebrow>{eyebrow}</Eyebrow><div className="hero-emoji">{emoji}</div><h1>{title}</h1><p>{text}</p><button className="primary" onClick={onClick}>{button}</button></>; }
 function Eyebrow({ children }: { children: React.ReactNode }) { return <span className="eyebrow">{children}</span>; }
