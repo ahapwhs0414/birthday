@@ -8,8 +8,8 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title,
   description,
-  openGraph: { title, description, type: "website", images: [{ url: "/og.svg", width: 1200, height: 630 }] },
-  twitter: { card: "summary_large_image", title, description, images: ["/og.svg"] },
+  openGraph: { title, description, type: "website", images: [{ url: "/yejin_banner.png", width: 1731, height: 909 }] },
+  twitter: { card: "summary_large_image", title, description, images: ["/yejin_banner.png"] },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
